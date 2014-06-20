@@ -1,0 +1,21 @@
+<apex:page standardController="Opportunity" recordSetVar="opportunities" extensions="BumpControllerExtension">
+	<apex:sectionHeader title="{!$ObjectType.Opportunity.LabelPlural}" subtitle="Bump" />
+	<apex:form >
+	<apex:pageBlock title="Opportunities">
+		<apex:pageMessages />
+		<apex:pageBlockButtons >
+			<apex:commandButton action="{!bump}" value="Bump"/>
+			<apex:commandButton action="{!cancel}" value="Cancel"/>
+		</apex:pageBlockButtons>
+		<apex:pageBlockSection collapsible="false" columns="2" title="Bump Details">
+			<apex:inputText value="{!bumpMessage}"/>
+		</apex:pageBlockSection>
+		<apex:pageBlockSection collapsible="false" columns="1" title="Opportunity Details">
+			<apex:pageBlockTable value="{!opportunities}" var="opportunity">
+	            <apex:column value="{!opportunity.name}"/>
+	            <apex:column value="{!opportunity.stageName}"/>
+	    	</apex:pageBlockTable>   
+		</apex:pageBlockSection>
+	</apex:pageBlock>
+	</apex:form>
+</apex:page>
