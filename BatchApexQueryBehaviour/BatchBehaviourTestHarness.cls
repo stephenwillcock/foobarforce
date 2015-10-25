@@ -1,19 +1,19 @@
 public class BatchBehaviourTestHarness implements Database.Batchable<sObject>, Database.Stateful
 {
-	/*
-	 * Static
-	 */
+     /*
+      * Static
+      */
     
     static final String TEST_NAME = 'TEST_TO_DELETE';
     static final Integer BATCH_SIZE = 10;
 
     public static void createTestData()
     {
-		Creator job = new Creator();
+        Creator job = new Creator();
         job.TestName = TEST_NAME;
         job.NumberPrefix = 'TEST_';
-		job.NumberOfRecords = 5000;
-		System.enqueueJob(job);
+        job.NumberOfRecords = 5000;
+        System.enqueueJob(job);
     }
 
     public static void deleteTestData()
@@ -41,42 +41,41 @@ public class BatchBehaviourTestHarness implements Database.Batchable<sObject>, D
         Updater updater = new Updater();
         updater.Tag = tag;
         job.Worker = updater; 
-		job.Ascending = ascending;
+        job.Ascending = ascending;
         job.TestName = TEST_NAME;
-		Database.executeBatch(job,BATCH_SIZE);
+        Database.executeBatch(job,BATCH_SIZE);
     }
     
     static void deleteTestDataBatch(Boolean ascending)
     {
         BatchBehaviourTestHarness job = new BatchBehaviourTestHarness();
         job.Worker = new Deleter();
-		job.Ascending = ascending;
+        job.Ascending = ascending;
         job.TestName = TEST_NAME;
-		Database.executeBatch(job,BATCH_SIZE);
+        Database.executeBatch(job,BATCH_SIZE);
     }
     
-	/*
-	 * Instance
-	 */
+    /*
+     * Instance
+     */
     
     public Boolean Ascending = true;
     public String TestName;
     public IBatchWorker Worker;
 
     public Database.querylocator start(Database.BatchableContext BC)
-	{
-		String q = 'select Id,Name,AccountNumber,Site from Account where Name=\''+ TestName + '\' order by AccountNumber ' + (Ascending ? 'ASC' : 'DESC');
+    {
+        String q = 'select Id,Name,AccountNumber,Site from Account where Name=\''+ TestName + '\' order by AccountNumber ' + (Ascending ? 'ASC' : 'DESC');
         system.debug(q);
         return Database.getQueryLocator(q);
-        
     }
 
     public void execute(Database.BatchableContext BC, List<sObject> scope)
-	{
+    {
         Worker.execute(scope);
-	}
+    }
     
-	public void finish(Database.BatchableContext BC){}
+    public void finish(Database.BatchableContext BC){}
     
     /* 
      * Workers
@@ -89,12 +88,12 @@ public class BatchBehaviourTestHarness implements Database.Batchable<sObject>, D
     
     public class Updater implements IBatchWorker
     {
-		public String Tag = '';
+        public String Tag = '';
         Integer Counter = 0;
         
         public void execute(List<sObject> scope)
         {
-			Counter++;
+            Counter++;
             for(sObject item : scope)
             {
                 if(item instanceof Account)
@@ -138,19 +137,18 @@ public class BatchBehaviourTestHarness implements Database.Batchable<sObject>, D
     {
         public String TestName;
 
-		// Queueable
+        // Queueable
         public void execute(System.QueueableContext qc)
         {
             List<Account> accounts =[select id from Account where Name=:TestName limit 5000];
             execute(accounts);
         }
 
-		// IBatchWorker
+        // IBatchWorker
         public void execute(List<sObject> scope)
         {
             Database.delete(scope);
             Database.emptyRecycleBin(scope);
-
         }
     }
 }
